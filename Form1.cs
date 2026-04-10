@@ -18,9 +18,26 @@ namespace CrudMahasiswaADO
         public FormMahasiswa()
         {
             InitializeComponent();
-           
+           conn = new SqlConnection(connectionString);
         }
-
+        private void ConnectToDatabase()
+        {
+            try
+            {   if (conn.State == ConnectionState.Closed)
+                {
+                    conn.Open();
+                }
+                MessageBox.Show("Koneksi berhasil!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Koneksi gagal: " + ex.Message);
+            }
+           
+            {
+                conn.Close();
+            }
+        }
         private void For_Load(object sender, EventArgs e)
         {
 
@@ -58,7 +75,7 @@ namespace CrudMahasiswaADO
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
-
+            ConnectToDatabase();
         }
 
         private void btnLoad_Click(object sender, EventArgs e)

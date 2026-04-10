@@ -16,7 +16,7 @@ namespace CrudMahasiswaADO
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new For());
+            Application.Run(new FormMahasiswa());
         }
     }
 }

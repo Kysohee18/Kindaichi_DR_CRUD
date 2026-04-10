@@ -6,15 +6,19 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.SqlClient;
 using System.Windows.Forms;
 
 namespace CrudMahasiswaADO
 {
-    public partial class For : Form
-    {
-        public For()
+    public partial class FormMahasiswa : Form
+    {       
+        private SqlConnection conn;
+        private readonly string connectionString = @"Data Source=DESKTOP-6V58GOQ\PUTRASQL; Initial Catalog=DBAkademikADO; Integrated Security=True";
+        public FormMahasiswa()
         {
             InitializeComponent();
+           
         }
 
         private void For_Load(object sender, EventArgs e)

@@ -190,8 +190,38 @@ namespace CrudMahasiswaADO
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
-            
-            
+            try
+            {
+                if (conn.State == ConnectionState.Closed)
+                {
+                    conn.Open();
+                }
+                string query = @"UPDATE Mahasiswa SET Nama = @Nama, JenisKelamin = @JK, Tanggallahir = @TanggalLahir, Alamat = @Alamat, KodeProdi = @KodeProdi WHERE NIM = @NIM";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@NIM", txtNim.Text);
+                cmd.Parameters.AddWithValue("@Nama", txtNama.Text);
+                cmd.Parameters.AddWithValue("@JK", cmbJK.Text);
+                cmd.Parameters.AddWithValue("@TanggalLahir", dptTanggalLahir.Value.Date);
+                cmd.Parameters.AddWithValue("@Alamat", txtAlamat.Text);
+                cmd.Parameters.AddWithValue("@KodeProdi", txtProdi.Text);
+
+                int result = cmd.ExecuteNonQuery();
+                if (result > 0)
+                {
+                    MessageBox.Show("Data berhasil diupdate");
+                    ClearForm();
+                    btnLoad.PerformClick();
+                }
+                else
+                {
+                    MessageBox.Show("Data tidak ditemukan");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
+            }
+
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
@@ -222,10 +252,37 @@ namespace CrudMahasiswaADO
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
+            }
+        }
+
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-
+            if (e.RowIndex >= 6)
+            {
+                DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
+                txtNim.Text = row.Cells["NIM"].Value.ToString();
+                txtNama.Text = row.Cells["Nama"].Value.ToString();
+                cmbJK.Text = row.Cells["Jenis kelamin"].Value.ToString();
+                dptTanggalLahir.Value = Convert.ToDateTime(row.Cells["Tanggal Lahir"].Value);
+                txtAlamat.Text = row.Cells["Alamat"].Value.ToString();
+                txtProdi.Text = row.Cells["Kode Prodi"].Value.ToString();
+            }
         }
+
+        private void ClearForm()
+        {
+            txtNim.Clear();
+            txtNama.Clear();
+            cmbJK.SelectedIndex = -1;
+            dptTanggalLahir.Value = DateTime.Now;
+            txtAlamat.Clear();
+            txtProdi.Clear();
+        }
+
     }
+
 }

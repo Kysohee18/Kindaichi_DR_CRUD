@@ -80,6 +80,15 @@ namespace CrudMahasiswaADO
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
+            cmbJK.Items.Clear();
+            cmbJK.Items.Add("L");
+            cmbJK.Items.Add("P");
+
+            dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dataGridView1.MultiSelect = false;
+            dataGridView1.ReadOnly = true;
+            dataGridView1.AllowUserToAddRows = false;
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
         }
 
@@ -90,7 +99,8 @@ namespace CrudMahasiswaADO
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
-
+            
+            
         }
 
         private void btnDelete_Click(object sender, EventArgs e)

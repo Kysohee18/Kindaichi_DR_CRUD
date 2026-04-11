@@ -102,7 +102,7 @@ namespace CrudMahasiswaADO
                     dataGridView1.Columns.Add("Alamat", "Alamat");
                     dataGridView1.Columns.Add("KodeProdi", "Kode Prodi");
 
-                    string query = "SELECT FROM Mahasiswa";
+                    string query = "SELECT * FROM Mahasiswa";
                     SqlCommand cmd = new SqlCommand(query, conn);
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -160,7 +160,7 @@ namespace CrudMahasiswaADO
                     return;
                 }
 
-                string query = "INSERT INTO Mahasiswa (NIM, Nana, Jeniskelanin, Tanggallahir, Alamat, KodeProdi, Tangga Daftar) VALUES (@NIM, @Nama, @JK, @TanggalLahir, @Alamat, @HodeProdi, @Tanggal Daftar)";
+                string query = "INSERT INTO Mahasiswa (NIM, Nama, JenisKelamin, Tanggallahir, Alamat, KodeProdi) VALUES (@NIM, @Nama, @JK, @TanggalLahir, @Alamat, @HodeProdi)";
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@NIM", txtNim.Text);
                 cmd.Parameters.AddWithValue("@Nama", txtNama.Text);
@@ -168,7 +168,7 @@ namespace CrudMahasiswaADO
                 cmd.Parameters.AddWithValue("@TanggalLahir", dptTanggalLahir.Value.Date);
                 cmd.Parameters.AddWithValue("@Alamat", txtAlamat.Text);
                 cmd.Parameters.AddWithValue("@HodeProdi", txtProdi.Text);
-                cmd.Parameters.AddWithValue("@Tanggal Daftar", DateTime.Now);
+                
 
                 int result = cmd.ExecuteNonQuery();
                 if (result > 0)
@@ -259,17 +259,17 @@ namespace CrudMahasiswaADO
         }
 
 
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 6)
+            if (e.RowIndex >= 0)
             {
                 DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
                 txtNim.Text = row.Cells["NIM"].Value.ToString();
                 txtNama.Text = row.Cells["Nama"].Value.ToString();
-                cmbJK.Text = row.Cells["Jenis kelamin"].Value.ToString();
+                cmbJK.Text = row.Cells["Jeniskelamin"].Value.ToString();
                 dptTanggalLahir.Value = Convert.ToDateTime(row.Cells["Tanggal Lahir"].Value);
                 txtAlamat.Text = row.Cells["Alamat"].Value.ToString();
-                txtProdi.Text = row.Cells["Kode Prodi"].Value.ToString();
+                txtProdi.Text = row.Cells["KodeProdi"].Value.ToString();
             }
         }
 

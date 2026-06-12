@@ -96,9 +96,12 @@ namespace CrudMahasiswaADO
         }
         private void btnCetak_Click(object sender, EventArgs e)
         {
+            string prodiTerpilih = cmbProdi.SelectedValue.ToString();
+            DateTime tanggalTerpilih = dtpTanggalMasuk.Value;
+
             
-            Form2 fm2 = new Form2();
-            fm2.Show();
+            Form3 fm3 = new Form3(prodiTerpilih, tanggalTerpilih);
+            fm3.Show();
             this.Hide();
         }
 

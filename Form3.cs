@@ -7,18 +7,18 @@ namespace CrudMahasiswaADO
 {
     public partial class Form3 : Form
     {
-       
+        
         static string connectionString = @"Data Source=DESKTOP-6V58GOQ\PUTRASQL; Initial Catalog=DBAkademikADO; Integrated Security=True";
         SqlConnection conn = new SqlConnection(connectionString);
         SqlDataAdapter da;
         DataTable dtMahasiswa;
 
-       
-       
-        string prodi;
+        CrystalReport1 laporan = new CrystalReport1();
+
+        string prodi { get; set; }  
         DateTime tglmasuk;
 
-        
+
         public Form3(string Prodi, DateTime TglMasuk)
         {
             InitializeComponent();
@@ -26,7 +26,7 @@ namespace CrudMahasiswaADO
             tglmasuk = TglMasuk;
         }
 
-        
+
         private void Form3_Load(object sender, EventArgs e)
         {
             try
@@ -46,11 +46,9 @@ namespace CrudMahasiswaADO
                 dtMahasiswa = new DataTable();
                 da.Fill(dtMahasiswa);
 
-                
-                CrystalReport1 laporan = new CrystalReport1();
                 laporan.SetDataSource(dtMahasiswa);
 
-            
+                
                 crystalReportViewer1.ReportSource = laporan;
                 crystalReportViewer1.Refresh();
             }
@@ -60,7 +58,7 @@ namespace CrudMahasiswaADO
             }
             finally
             {
-                conn.Close(); 
+                conn.Close();
             }
         }
     }

@@ -401,6 +401,14 @@ namespace CrudMahasiswaADO
                 }
             }
         }
+        private void btnRekap_Click(object sender, EventArgs e)
+        {
+            
+            Form2 fm2 = new Form2();
+            fm2.Show();
+            this.Hide();
+        }
+
     }
 
 }

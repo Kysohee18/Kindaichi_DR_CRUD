@@ -94,8 +94,15 @@ namespace CrudMahasiswaADO
                 MessageBox.Show("Gagal Load data: " + ex.Message); 
             }
         }
+        private void btnCetak_Click(object sender, EventArgs e)
+        {
+            
+            Form2 fm2 = new Form2();
+            fm2.Show();
+            this.Hide();
+        }
 
-        
+
 
     }
     

@@ -109,6 +109,7 @@
             this.btnCetak.TabIndex = 7;
             this.btnCetak.Text = "cetak";
             this.btnCetak.UseVisualStyleBackColor = true;
+            this.btnCetak.Click += new System.EventHandler(this.btnCetak_Click);
             // 
             // Form2
             // 

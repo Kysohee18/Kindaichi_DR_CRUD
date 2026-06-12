@@ -8,11 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
 using System.Windows.Forms;
+using System.Xml.Serialization;
+using System.Linq.Expressions;
 
 namespace CrudMahasiswaADO
 {
     public partial class FormMahasiswa : Form
-    {       
+    {   private BindingSource bindingSource = new BindingSource();
+        private DataTable dtMahasiswa = new DataTable();
         private SqlConnection conn;
         private readonly string connectionString = @"Data Source=DESKTOP-6V58GOQ\PUTRASQL; Initial Catalog=DBAkademikADO; Integrated Security=True";
         public FormMahasiswa()
@@ -38,8 +41,28 @@ namespace CrudMahasiswaADO
                 conn.Close();
             }
         }
+
+        private void SimpanLog(string pesan)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "INSERT INTO LogError VALUES(GETDATE(), @pesan)";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@pesan", pesan);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+
+            }
+        }
+
         private void For_Load(object sender, EventArgs e)
         {
+            
+            this.mahasiswaTableAdapter.Fill(this.dBAkademikADODataSet.Mahasiswa);
             cmbJK.Items.Clear();
             cmbJK.Items.Add("L");
             cmbJK.Items.Add("P");
@@ -51,212 +74,149 @@ namespace CrudMahasiswaADO
             dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
 
-        private void txtNim_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void txtNama_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void cmbJK_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void dptTanggalLahir_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void txtAlamat_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void txtProdi_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
+      
         private void btnConnect_Click(object sender, EventArgs e)
         {
-            ConnectToDatabase();
+          try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    MessageBox.Show("Koneksi berhasil!");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Koneksi gagal: " + ex.Message);
+            }
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
-            try
-            {
-                if (conn.State == ConnectionState.Closed)
-                {
-                    conn.Open();
-                    dataGridView1.Rows.Clear();
-                    dataGridView1.Columns.Clear();
-                    dataGridView1.Columns.Add("NIM", "NIM");
-                    dataGridView1.Columns.Add("Nama", "Nama");
-                    dataGridView1.Columns.Add("JenisKelamin", "Jenis Kelamin");
-                    dataGridView1.Columns.Add("Tanggal Lahir", "Tanggal Lahir");
-                    dataGridView1.Columns.Add("Alamat", "Alamat");
-                    dataGridView1.Columns.Add("KodeProdi", "Kode Prodi");
-
-                    string query = "SELECT * FROM Mahasiswa";
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    while (reader.Read())
-                    {
-                        dataGridView1.Rows.Add(
-                            reader["NIM"].ToString(),
-                            reader["Nama"].ToString(),
-                            reader["JenisKelamin"].ToString(),
-                            Convert.ToDateTime(reader["Tanggallahir"]).ToShortDateString(),
-                            reader["Alamat"].ToString(),
-                            reader["KodeProdi"].ToString()
-                        );
-                    }
-                    reader.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Gagal menampilkan data: " + ex.Message);
-            }
+            LoadData();
 
         }
 
         private void addData_Click(object sender, EventArgs e)
-        {
+        {   SqlConnection conn = 
+                new SqlConnection(connectionString);
+            conn.Open();
+            
+            SqlTransaction trans =
+                conn.BeginTransaction();
             try
             {
-                if (conn.State == ConnectionState.Closed)
-                {
-                    conn.Open();
-                }
-                if (txtNim.Text == "")
-                {
-                    MessageBox.Show("NIM harus diisi");
-                    txtNim.Focus();
-                    return;
-                }
-                if (txtNama.Text == "")
-                {
-                    MessageBox.Show("Nama harus diisi");
-                    txtNama.Focus();
-                    return;
-                }
-                if (cmbJK.Text == "")
-                {
-                    MessageBox.Show("Jenis Kelamin harus dipilih");
-                    cmbJK.Focus();
-                    return;
-                }
-                if (txtProdi.Text == "")
-                {
-                    MessageBox.Show("Kode Prodi harus diisi");
-                    txtProdi.Focus();
-                    return;
-                }
+                SqlCommand cmd =
+                    new SqlCommand("sp_InsertMahasiswa", conn, trans);
 
-                string query = "INSERT INTO Mahasiswa (NIM, Nama, JenisKelamin, Tanggallahir, Alamat, KodeProdi) VALUES (@NIM, @Nama, @JK, @TanggalLahir, @Alamat, @HodeProdi)";
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@NIM", txtNim.Text);
-                cmd.Parameters.AddWithValue("@Nama", txtNama.Text);
-                cmd.Parameters.AddWithValue("@JK", cmbJK.Text);
-                cmd.Parameters.AddWithValue("@TanggalLahir", dptTanggalLahir.Value.Date);
-                cmd.Parameters.AddWithValue("@Alamat", txtAlamat.Text);
-                cmd.Parameters.AddWithValue("@HodeProdi", txtProdi.Text);
-                
-
-                int result = cmd.ExecuteNonQuery();
-                if (result > 0)
-                {
-                    MessageBox.Show("Data mahasiswa berhasil ditambahkan");
-;                   ClearForm();
-                    btnLoad.PerformClick();
-                }
-                else
-                {
-                    MessageBox.Show("Data gagal ditambahkan");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
-            }
-        }
-
-        private void btnUpdate_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if (conn.State == ConnectionState.Closed)
-                {
-                    conn.Open();
-                }
-                string query = @"UPDATE Mahasiswa SET Nama = @Nama, JenisKelamin = @JK, Tanggallahir = @TanggalLahir, Alamat = @Alamat, KodeProdi = @KodeProdi WHERE NIM = @NIM";
-                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.CommandType =
+                    CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@NIM", txtNim.Text);
                 cmd.Parameters.AddWithValue("@Nama", txtNama.Text);
                 cmd.Parameters.AddWithValue("@JK", cmbJK.Text);
                 cmd.Parameters.AddWithValue("@TanggalLahir", dptTanggalLahir.Value.Date);
                 cmd.Parameters.AddWithValue("@Alamat", txtAlamat.Text);
                 cmd.Parameters.AddWithValue("@KodeProdi", txtProdi.Text);
+                cmd.ExecuteNonQuery();
+                SqlCommand cmdLog =
+                    new SqlCommand(@"INSERT INTO LogAktivitasSalaH (aktivitas,waktu) VALUES (@aktivitas, GETDATE())",
+                conn, trans);
+                cmdLog.Parameters.AddWithValue("@aktivitas", "INSERT MAHASISWA : " + txtNim.Text);
+                cmdLog.ExecuteNonQuery();
+                trans.Commit();
+                MessageBox.Show("Data berhasil disimpan!");
 
-                int result = cmd.ExecuteNonQuery();
-                if (result > 0)
-                {
-                    MessageBox.Show("Data berhasil diupdate");
-                    ClearForm();
-                    btnLoad.PerformClick();
-                }
-                else
-                {
-                    MessageBox.Show("Data tidak ditemukan");
-                }
+                LoadData();
+            }
+
+
+
+            catch (SqlException ex)
+
+            {
+                trans.Rollback();
+                SimpanLog(
+                    "ROLLBACK INSERT" + ex.Message
+                    );
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
+                trans.Rollback();
+                SimpanLog(
+                    "GENERAL ERROR: " + ex.Message
+                    );
             }
+            finally { conn.Close(); }
+                }
+            
+             
+                
+               
+        
 
-        }
-
-        private void btnDelete_Click(object sender, EventArgs e)
+        private void btnUpdate_Click(object sender, EventArgs e)
         {
             try
             {
-                if (conn.State == ConnectionState.Closed)
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    conn.Open();
-                }
-                DialogResult resultConfirm = MessageBox.Show("Yakin ingin menghapus data?", "Konfirmasi", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (resultConfirm == DialogResult.Yes)
-                {
-                    string query = "DELETE FROM Mahasiswa WHERE NIM = @NIM";
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@NIM", txtNim.Text);
+                    using (SqlCommand cmd = new SqlCommand("sp_UpdateMahasiswa", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
 
-                    int result = cmd.ExecuteNonQuery();
-                    if (result > 0)
-                    {
-                        MessageBox.Show("Data berhasil dihapus");
-                        ClearForm();
-                        btnLoad.PerformClick();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Data tidak ditemukan");
+                        cmd.Parameters.AddWithValue("@NIM", txtNim.Text);
+                        cmd.Parameters.AddWithValue("@Nama", txtNama.Text);
+                        cmd.Parameters.AddWithValue("@JK", cmbJK.Text);
+                        cmd.Parameters.AddWithValue("@TanggalLahir", dptTanggalLahir.Value.Date);
+                        cmd.Parameters.AddWithValue("@Alamat", txtAlamat.Text);
+                        cmd.Parameters.AddWithValue("@KodeProdi", txtProdi.Text);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
+                MessageBox.Show("Terjadi Kesalahan: " + ex.Message);
             }
         }
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(txtNim.Text)) return;
+
+            var confirm = MessageBox.Show("Yakin ingin menghapus data ini?", "Konfirmasi", MessageBoxButtons.YesNo);
+            if (confirm == DialogResult.Yes)
+            {
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(connectionString))
+                    {
+                        using (SqlCommand cmd = new SqlCommand("sp_DeleteMahasiswa", conn))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            cmd.Parameters.Add("@NIM", SqlDbType.Char, 11).Value = txtNim.Text;
+
+                            conn.Open();
+                            int rowsAffected = cmd.ExecuteNonQuery();
+
+                            if (rowsAffected > 0)
+                                MessageBox.Show("Data berhasil dihapus!");
+                            else
+                                MessageBox.Show("Data tidak ditemukan");
+                        }
+                    }
+                    MessageBox.Show("Data berhasil dihapus!");
+                    LoadData();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Kesalahan: " + ex.Message);
+                }
+            }
+        }
+
 
 
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -266,8 +226,8 @@ namespace CrudMahasiswaADO
                 DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
                 txtNim.Text = row.Cells["NIM"].Value.ToString();
                 txtNama.Text = row.Cells["Nama"].Value.ToString();
-                cmbJK.Text = row.Cells["Jeniskelamin"].Value.ToString();
-                dptTanggalLahir.Value = Convert.ToDateTime(row.Cells["Tanggal Lahir"].Value);
+                cmbJK.Text = row.Cells["JenisKelamin"].Value.ToString();
+                dptTanggalLahir.Value = Convert.ToDateTime(row.Cells["TanggalLahir"].Value);
                 txtAlamat.Text = row.Cells["Alamat"].Value.ToString();
                 txtProdi.Text = row.Cells["KodeProdi"].Value.ToString();
             }
@@ -283,6 +243,165 @@ namespace CrudMahasiswaADO
             txtProdi.Clear();
         }
 
+        private void FormMahasiswa_Load(object sender, EventArgs e)
+        {
+            cmbJK.DataSource = new string[] { "L", "P" };
+            //grid
+            dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dataGridView1.MultiSelect = false;
+            dataGridView1.ReadOnly = true;
+            dataGridView1.AllowUserToAddRows = false;
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            //binding navigator
+            bindingNavigator1.BindingSource = bindingSource;
+            
+            LoadData();
+        }
+        //loaddata
+        private void LoadData()
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    using (SqlCommand cmd = new SqlCommand("sp_GetMahasiswa", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                        {
+                            dtMahasiswa = new DataTable();
+                            da.Fill(dtMahasiswa);
+
+                            bindingSource.DataSource = dtMahasiswa;
+                            dataGridView1.DataSource = bindingSource;
+
+                            BindControls();
+                            
+                        }
+                    }
+                }
+                HitungTotal();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Gagal load data: " + ex.Message);
+            }
+        }
+
+        private void BindControls()
+        {
+            // Clear existing bindings to prevent duplicates
+            txtNim.DataBindings.Clear();
+            txtNama.DataBindings.Clear();
+            cmbJK.DataBindings.Clear();
+            dptTanggalLahir.DataBindings.Clear();
+            txtAlamat.DataBindings.Clear();
+            txtProdi.DataBindings.Clear();
+
+            // Bind to BindingSource
+            txtNim.DataBindings.Add("Text", bindingSource, "NIM", true, DataSourceUpdateMode.OnPropertyChanged);
+            txtNama.DataBindings.Add("Text", bindingSource, "Nama", true, DataSourceUpdateMode.OnPropertyChanged);
+            cmbJK.DataBindings.Add("Text", bindingSource, "JenisKelamin", true, DataSourceUpdateMode.OnPropertyChanged);
+            dptTanggalLahir.DataBindings.Add("Value", bindingSource, "TanggalLahir", true, DataSourceUpdateMode.OnPropertyChanged);
+            txtAlamat.DataBindings.Add("Text", bindingSource, "Alamat", true, DataSourceUpdateMode.OnPropertyChanged);
+            txtProdi.DataBindings.Add("Text", bindingSource, "KodeProdi", true, DataSourceUpdateMode.OnPropertyChanged);
+        }
+
+        //belum selesai
+        private void HitungTotal()
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+
+                    using (SqlCommand cmd = new SqlCommand("sp_CountMahasiswa", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        SqlParameter outputParam = new SqlParameter("@Total", SqlDbType.Int);
+                        outputParam.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(outputParam);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+
+                        labelTotal1.Text = "Total Mahasiswa: " + outputParam.Value.ToString();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Gagal menghitung total: " + ex.Message);
+            }
+        }
+
+        private void btnResetData_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    string query = @"
+                        IF OBJECT_ID('dbo.Mahasiswa_Backup') IS NOT NULL
+                        BEGIN
+                            DELETE FROM dbo.Mahasiswa;
+                            INSERT INTO dbo.Mahasiswa
+                            SELECT * FROM dbo.Mahasiswa_Backup;
+                        END";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                MessageBox.Show("Data berhasil direset!");
+                LoadData();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Reset gagal: " + ex.Message);
+            }
+        }
+
+        private void btnTestInjection_Click(object sender, EventArgs e)
+        {
+            {
+                try
+                {
+                    using (SqlConnection conn = 
+                        new SqlConnection(connectionString))
+                    {
+                       
+
+                        string query =
+                            "UPDATE Mahasiswa SET Nama ='" +   
+                            txtNama.Text +
+                            "' WHERE NIM ='" + 
+                            txtNim.Text + "'";
+
+                        SqlCommand cmd =
+                            new SqlCommand(query, conn);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                        
+                        MessageBox.Show("update berhasil!");
+                        
+                        
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+        }
     }
 
 }
+

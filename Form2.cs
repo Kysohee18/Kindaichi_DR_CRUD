@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CrudMahasiswaADO
-{
+{  
     public partial class Form2 : Form
         
     {

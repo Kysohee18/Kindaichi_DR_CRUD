@@ -7,17 +7,17 @@ namespace CrudMahasiswaADO
 {
     public partial class Form3 : Form
     {
-        
-        static string connectionString = @"Data Source=DESKTOP-6V58GOQ\PUTRASQL; Initial Catalog=DBAkademikADO; Integrated Security=True";
+        // Gunakan localhost untuk mengamankan soket jaringan pelaporan
+        static string connectionString = @"Data Source=localhost\PUTRASQL; Initial Catalog=DBAkademikADO; Integrated Security=True";
         SqlConnection conn = new SqlConnection(connectionString);
         SqlDataAdapter da;
         DataTable dtMahasiswa;
 
+        // Instansiasi dokumen laporan murni sesuai modul
         CrystalReport1 laporan = new CrystalReport1();
 
-        string prodi { get; set; }  
+        string prodi;
         DateTime tglmasuk;
-
 
         public Form3(string Prodi, DateTime TglMasuk)
         {
@@ -26,17 +26,10 @@ namespace CrudMahasiswaADO
             tglmasuk = TglMasuk;
         }
 
-
         private void Form3_Load(object sender, EventArgs e)
         {
             try
             {
-                if (conn.State == ConnectionState.Closed)
-                {
-                    conn.Open();
-                }
-
-                
                 SqlCommand cmd = new SqlCommand("sp_Report", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@inProdi", prodi);
@@ -44,21 +37,20 @@ namespace CrudMahasiswaADO
 
                 da = new SqlDataAdapter(cmd);
                 dtMahasiswa = new DataTable();
+
+                // Mengisi data sekaligus membuka-menutup koneksi secara otomatis
                 da.Fill(dtMahasiswa);
 
+                // Menyuntikkan data murni sesuai modul
                 laporan.SetDataSource(dtMahasiswa);
 
-                
+                // Memproyeksikan laporan ke komponen viewer UI
                 crystalReportViewer1.ReportSource = laporan;
                 crystalReportViewer1.Refresh();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Gagal Memuat Laporan: " + ex.Message);
-            }
-            finally
-            {
-                conn.Close();
             }
         }
     }

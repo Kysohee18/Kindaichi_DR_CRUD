@@ -14,7 +14,8 @@ namespace CrudMahasiswaADO
     public partial class Form2 : Form
         
     {
-        static string connectionString = "Data Source=DESKTOP-6V58GOQ\\PUTRASQL; Initial Catalog=DBAkademikADO; Integrated Security=True";
+        // Mengganti nama komputer dengan localhost untuk menghindari SocketException
+        static string connectionString = @"Data Source=localhost\PUTRASQL; Initial Catalog=DBAkademikADO; Integrated Security=True";
         SqlConnection conn = new SqlConnection(connectionString);
         SqlDataAdapter da;
         DataTable dtMahasiswa;
@@ -99,8 +100,9 @@ namespace CrudMahasiswaADO
             string prodiTerpilih = cmbProdi.SelectedValue.ToString();
             DateTime tanggalTerpilih = dtpTanggalMasuk.Value;
 
-            
             Form3 fm3 = new Form3(prodiTerpilih, tanggalTerpilih);
+
+           
             fm3.Show();
             this.Hide();
         }

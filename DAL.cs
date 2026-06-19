@@ -68,7 +68,20 @@ namespace CrudMahasiswaADO
             }
             finally { conn.Close(); }
         }
-
+        public int GetTotalMahasiswa()
+        {
+            int total = 0;
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "SELECT COUNT(*) FROM Mahasiswa";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    conn.Open();
+                    total = (int)cmd.ExecuteScalar();
+                }
+            }
+            return total;
+        }
         public void UpdateMhs(string nim, string nama, string alamat, string jeniskelamin, DateTime tanggallahir, string kodeProdi, byte[] foto)
         {
             if (conn.State == ConnectionState.Closed) conn.Open();

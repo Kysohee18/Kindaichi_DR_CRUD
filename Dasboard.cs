@@ -20,12 +20,7 @@ namespace CrudMahasiswaADO
         public Dasboard()
         {
             InitializeComponent();
-            dptTanggalMasuk.mindate = new DateTime(2000, 1, 1);
-            dptTanggalmasuk.format = DateTimePickerFormat.Custom;
-            dptTanggalMasuk.customformat = "yyyy";
-            dptTanggalMasuk.showupdown = true;
-            dptTanggalMasuk.maxdate = DateTime.Now;
-            
+
             dtpTanggalMasuk.MinDate = new DateTime(2000, 1, 1);
             dtpTanggalMasuk.MaxDate = DateTime.Now;
             dtpTanggalMasuk.Format = DateTimePickerFormat.Custom;
@@ -33,33 +28,55 @@ namespace CrudMahasiswaADO
             dtpTanggalMasuk.ShowUpDown = true;
 
             cmbTipe.DropDownStyle = ComboBoxStyle.DropDownList;
-
-            var items = new System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, SeriesChartType>>
+            var items = new System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, System.Windows.Forms.DataVisualization.Charting.SeriesChartType>>
             {
-                new System.Collections.Generic.KeyValuePair<string, SeriesChartType>("Kolom", SeriesChartType.Column),
-                new System.Collections.Generic.KeyValuePair<string, SeriesChartType>("Pie", SeriesChartType.Pie)
+                new System.Collections.Generic.KeyValuePair<string, System.Windows.Forms.DataVisualization.Charting.SeriesChartType>("Kolom", System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Column),
+                new System.Collections.Generic.KeyValuePair<string, System.Windows.Forms.DataVisualization.Charting.SeriesChartType>("Pie", System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Pie)
             };
-
+            isInitializing = true;
             cmbTipe.DataSource = items;
             cmbTipe.DisplayMember = "Key";
             cmbTipe.ValueMember = "Value";
             cmbTipe.SelectedIndex = 0;
-
             isInitializing = false;
 
+            // Pemicu render perdana
+            LoadDataChart();
+        }
+        private void Dasboard_Load(object sender, EventArgs e)
+        {
+            
+        }
+        private void btnLoad_Click(object sender, EventArgs e)
+        {
+            buttonState = 1;
+
+            
+            LoadDataChart();
+        }
+        private void btnReset_Click(object sender, EventArgs e)
+        {
+            buttonState = 0;
 
             LoadDataChart();
         }
+        private void btnDatamhs_Click(object sender, EventArgs e)
+        {
+            FormMahasiswa formUtama = new FormMahasiswa();
+
+
+            formUtama.Show();
+
+            this.Close();
+        }
         public void LoadDataChart()
         {
-            // Pembersihan memori kanvas secara radikal sebelum merender ulang
             chartProdi.Series.Clear();
             chartProdi.Titles.Clear();
             chartProdi.Legends.Clear();
             chartProdi.ChartAreas.Clear();
-            
-            // Pembuatan area grafik
-            ChartArea ca = new ChartArea("MainArea");
+
+            System.Windows.Forms.DataVisualization.Charting.ChartArea ca = new System.Windows.Forms.DataVisualization.Charting.ChartArea("MainArea");
             ca.AxisX.Title = "Program Studi";
             ca.AxisY.Title = "Jumlah Mahasiswa";
             ca.AxisX.LabelStyle.Angle = -45;
@@ -67,31 +84,30 @@ namespace CrudMahasiswaADO
 
             try
             {
-                // Penentuan jalur pipa data berdasarkan filter
+                // Routing Data
                 if (buttonState == 1)
                 {
                     dt = dbLogic.getDataChartByTahun(dtpTanggalMasuk.Value);
-        }
+                }
                 else
-        {
+                {
                     dt = dbLogic.getAllDataChart();
                 }
 
-                // Penjahitan data ke dalam Series Grafik
-                SeriesChartType tipeTerpilih = (SeriesChartType)cmbTipe.SelectedValue;
-                Series s = new Series("Distribusi Mahasiswa");
+                System.Windows.Forms.DataVisualization.Charting.SeriesChartType tipeTerpilih = (System.Windows.Forms.DataVisualization.Charting.SeriesChartType)cmbTipe.SelectedValue;
+                System.Windows.Forms.DataVisualization.Charting.Series s = new System.Windows.Forms.DataVisualization.Charting.Series("Mahasiswa");
                 s.ChartType = tipeTerpilih;
                 s.IsValueShownAsLabel = true;
 
-                if (tipeTerpilih == SeriesChartType.Pie)
+                if (tipeTerpilih == System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Pie)
                 {
-                    s.Label = "#VAL";       // Nilai angka
-                    s.LegendText = "#VALX"; // Nama kategori
-        }
+                    s.Label = "#VAL";
+                    s.LegendText = "#VALX";
+                }
 
-                // Iterasi matriks data dari database ke titik koordinat visual
+                
                 foreach (DataRow row in dt.Rows)
-        {
+                {
                     string namaProdi = row["NamaProdi"].ToString();
                     int jumlahMhs = Convert.ToInt32(row["JmlhMhs"]);
                     s.Points.AddXY(namaProdi, jumlahMhs);
@@ -99,13 +115,25 @@ namespace CrudMahasiswaADO
 
                 chartProdi.Series.Add(s);
 
-                // Ornamen judul dan legenda
-                chartProdi.Titles.Add(new Title("Statistik Mahasiswa per Program Studi", Docking.Top, new Font("Segoe UI", 14, FontStyle.Bold), Color.Black));
-                chartProdi.Legends.Add(new Legend("LegendArea") { Docking = Docking.Right });
+                chartProdi.Titles.Add(new System.Windows.Forms.DataVisualization.Charting.Title("Statistik Program Studi", System.Windows.Forms.DataVisualization.Charting.Docking.Top, new Font("Arial", 14, FontStyle.Bold), Color.Black));
+                chartProdi.Legends.Add(new System.Windows.Forms.DataVisualization.Charting.Legend("LegendArea") { Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Right });
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Kegagalan rendering arsitektural: " + ex.Message, "System Error");
+                MessageBox.Show("Gagal merender grafik: " + ex.Message);
+            }
         }
+
+
+        private void cmbTipe_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Pengaman saat komponen awal dimuat
+            if (isInitializing) return;
+
+            // Memanggil mesin render secara presisi dengan tanda kurung ()
+            LoadDataChart();
+        }
+
+        
     }
 }

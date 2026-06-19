@@ -7,6 +7,7 @@ namespace CrudMahasiswaADO
 {
     public partial class Form3 : Form
     {
+        private DAL dbLogic = new DAL();
         static string connectionString = @"Data Source=localhost\PUTRASQL; Initial Catalog=DBAkademikADO; Integrated Security=True";
         SqlConnection conn = new SqlConnection(connectionString);
         SqlDataAdapter da;
@@ -21,6 +22,17 @@ namespace CrudMahasiswaADO
             InitializeComponent();
             prodi = Prodi;
             tglmasuk = TglMasuk;
+            try
+            {
+                DataTable dtMahasiswa = dbLogic.getDataRekap(prodi, tglmasuk);
+                listmahasiswa.setDataSource(dtMahasiswa);
+                crystalReportViewer1.ReportSource = listMahasiswa;
+                crystalReportViewer1.Refresh();
+            }
+                catch(Exception ex)
+            {
+                MessageBox.Show("Gagal loat data: " + ex.Message);
+            }
         }
 
         

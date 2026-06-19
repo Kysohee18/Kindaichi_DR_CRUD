@@ -13,7 +13,7 @@ namespace CrudMahasiswaADO
 {  
     public partial class Form2 : Form
         
-    {
+    {   DAL dbLogic = new DAL();
         // Mengganti nama komputer dengan localhost untuk menghindari SocketException
         // Menggunakan @ dan localhost untuk memotong translasi DNS pembawa SocketException
         static string connectionString = @"Data Source=localhost\PUTRASQL; Initial Catalog=DBAkademikADO; Integrated Security=True";

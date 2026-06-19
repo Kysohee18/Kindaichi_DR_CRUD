@@ -14,54 +14,21 @@ using System.Linq.Expressions;
 namespace CrudMahasiswaADO
 {
     public partial class FormMahasiswa : Form
-    {   private BindingSource bindingSource = new BindingSource();
-        private DataTable dtMahasiswa = new DataTable();
-        private SqlConnection conn;
-        private readonly string connectionString = @"Data Source=DESKTOP-6V58GOQ\PUTRASQL; Initial Catalog=DBAkademikADO; Integrated Security=True";
-        public FormMahasiswa()
+    {  
+       public FormMahasiswa()
         {
             InitializeComponent();
-           conn = new SqlConnection(connectionString);
-        }
-        private void ConnectToDatabase()
-        {
-            try
-            {   if (conn.State == ConnectionState.Closed)
-                {
-                    conn.Open();
-                }
-                MessageBox.Show("Koneksi berhasil!");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Koneksi gagal: " + ex.Message);
-            }
-           
-            {
-                conn.Close();
-            }
+            DAL dbLogic = new DAL()
         }
 
         private void SimpanLog(string pesan)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                string query = "INSERT INTO LogError VALUES(GETDATE(), @pesan)";
-
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@pesan", pesan);
-
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
-                }
-
-            }
+            dbLogic.InsertLog(pesan);
         }
 
         private void For_Load(object sender, EventArgs e)
         {
-            
+
             this.mahasiswaTableAdapter.Fill(this.dBAkademikADODataSet.Mahasiswa);
             cmbJK.Items.Clear();
             cmbJK.Items.Add("L");
@@ -74,7 +41,7 @@ namespace CrudMahasiswaADO
             dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
 
-      
+
         private void btnConnect_Click(object sender, EventArgs e)
         {
           try
@@ -97,90 +64,14 @@ namespace CrudMahasiswaADO
 
         }
 
-        private void addData_Click(object sender, EventArgs e)
-        {   SqlConnection conn = 
-                new SqlConnection(connectionString);
-            conn.Open();
-            
-            SqlTransaction trans =
-                conn.BeginTransaction();
-            try
-            {
-                SqlCommand cmd =
-                    new SqlCommand("sp_InsertMahasiswa", conn, trans);
-
-                cmd.CommandType =
-                    CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@NIM", txtNim.Text);
-                cmd.Parameters.AddWithValue("@Nama", txtNama.Text);
-                cmd.Parameters.AddWithValue("@JK", cmbJK.Text);
-                cmd.Parameters.AddWithValue("@TanggalLahir", dptTanggalLahir.Value.Date);
-                cmd.Parameters.AddWithValue("@Alamat", txtAlamat.Text);
-                cmd.Parameters.AddWithValue("@KodeProdi", txtProdi.Text);
-                cmd.ExecuteNonQuery();
-                SqlCommand cmdLog =
-                    new SqlCommand(@"INSERT INTO LogAktivitasSalaH (aktivitas,waktu) VALUES (@aktivitas, GETDATE())",
-                conn, trans);
-                cmdLog.Parameters.AddWithValue("@aktivitas", "INSERT MAHASISWA : " + txtNim.Text);
-                cmdLog.ExecuteNonQuery();
-                trans.Commit();
-                MessageBox.Show("Data berhasil disimpan!");
-
-                LoadData();
-            }
-
-
-
-            catch (SqlException ex)
-
-            {
-                trans.Rollback();
-                SimpanLog(
-                    "ROLLBACK INSERT" + ex.Message
-                    );
-            }
-            catch (Exception ex)
-            {
-                trans.Rollback();
-                SimpanLog(
-                    "GENERAL ERROR: " + ex.Message
-                    );
-            }
-            finally { conn.Close(); }
-                }
+        
             
              
                 
                
         
 
-        private void btnUpdate_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    using (SqlCommand cmd = new SqlCommand("sp_UpdateMahasiswa", conn))
-                    {
-                        cmd.CommandType = CommandType.StoredProcedure;
-
-                        cmd.Parameters.AddWithValue("@NIM", txtNim.Text);
-                        cmd.Parameters.AddWithValue("@Nama", txtNama.Text);
-                        cmd.Parameters.AddWithValue("@JK", cmbJK.Text);
-                        cmd.Parameters.AddWithValue("@TanggalLahir", dptTanggalLahir.Value.Date);
-                        cmd.Parameters.AddWithValue("@Alamat", txtAlamat.Text);
-                        cmd.Parameters.AddWithValue("@KodeProdi", txtProdi.Text);
-
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Terjadi Kesalahan: " + ex.Message);
-            }
-        }
+        
         private void btnDelete_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(txtNim.Text)) return;
@@ -258,36 +149,7 @@ namespace CrudMahasiswaADO
             LoadData();
         }
         //loaddata
-        private void LoadData()
-        {
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    using (SqlCommand cmd = new SqlCommand("sp_GetMahasiswa", conn))
-                    {
-                        cmd.CommandType = CommandType.StoredProcedure;
-
-                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
-                        {
-                            dtMahasiswa = new DataTable();
-                            da.Fill(dtMahasiswa);
-
-                            bindingSource.DataSource = dtMahasiswa;
-                            dataGridView1.DataSource = bindingSource;
-
-                            BindControls();
-                            
-                        }
-                    }
-                }
-                HitungTotal();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Gagal load data: " + ex.Message);
-            }
-        }
+        
 
         private void BindControls()
         {
@@ -309,33 +171,7 @@ namespace CrudMahasiswaADO
         }
 
         //belum selesai
-        private void HitungTotal()
-        {
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-
-                    using (SqlCommand cmd = new SqlCommand("sp_CountMahasiswa", conn))
-                    {
-                        cmd.CommandType = CommandType.StoredProcedure;
-
-                        SqlParameter outputParam = new SqlParameter("@Total", SqlDbType.Int);
-                        outputParam.Direction = ParameterDirection.Output;
-                        cmd.Parameters.Add(outputParam);
-
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
-
-                        labelTotal1.Text = "Total Mahasiswa: " + outputParam.Value.ToString();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Gagal menghitung total: " + ex.Message);
-            }
-        }
+        
 
         private void btnResetData_Click(object sender, EventArgs e)
         {

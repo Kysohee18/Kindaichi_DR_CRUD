@@ -13,10 +13,10 @@ namespace CrudMahasiswaADO
 {
     public partial class Dasboard : Form
     {
-        private DAL dbLogic = new DAL();
-        private DataTable dt;
-        private bool isInitializing = true;
-        private int buttonState = 0;
+        DAL dbLogic = new DAL();
+        bool isInitializing = true;
+        DataTable dt;
+        int buttonState = 0; // 0 = Semua Data, 1 = Filter Tahun
         public Dasboard()
         {
             InitializeComponent();

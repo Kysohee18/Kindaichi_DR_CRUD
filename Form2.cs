@@ -15,6 +15,7 @@ namespace CrudMahasiswaADO
         
     {
         // Mengganti nama komputer dengan localhost untuk menghindari SocketException
+        // Menggunakan @ dan localhost untuk memotong translasi DNS pembawa SocketException
         static string connectionString = @"Data Source=localhost\PUTRASQL; Initial Catalog=DBAkademikADO; Integrated Security=True";
         SqlConnection conn = new SqlConnection(connectionString);
         SqlDataAdapter da;

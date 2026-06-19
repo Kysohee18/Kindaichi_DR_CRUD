@@ -13,10 +13,10 @@ namespace CrudMahasiswaADO
 {
     public partial class Dasboard : Form
     {
-        DAL dblogic = new DAL();
-        bool isInitializing = true;
-        DataTable dt;
-        int button = 0;
+        private DAL dbLogic = new DAL();
+        private DataTable dt;
+        private bool isInitializing = true;
+        private int buttonState = 0;
         public Dasboard()
         {
             InitializeComponent();
@@ -26,47 +26,86 @@ namespace CrudMahasiswaADO
             dptTanggalMasuk.showupdown = true;
             dptTanggalMasuk.maxdate = DateTime.Now;
             
-            cmbTipe.dropdownstyle = ComboBoxStyle.DropDownList;
-            var items = new List<Keyvaluepair<string, SeriesChartType>>
+            dtpTanggalMasuk.MinDate = new DateTime(2000, 1, 1);
+            dtpTanggalMasuk.MaxDate = DateTime.Now;
+            dtpTanggalMasuk.Format = DateTimePickerFormat.Custom;
+            dtpTanggalMasuk.CustomFormat = "yyyy";
+            dtpTanggalMasuk.ShowUpDown = true;
+
+            cmbTipe.DropDownStyle = ComboBoxStyle.DropDownList;
+
+            var items = new System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, SeriesChartType>>
             {
-                new KeyValuePair<string, SeriesChartType>("Kolom", SeriesChartType.Coloum),
-                new KeyValuePair<string, SeriesChartType>("Pie", SeriesChartType.Pie),
+                new System.Collections.Generic.KeyValuePair<string, SeriesChartType>("Kolom", SeriesChartType.Column),
+                new System.Collections.Generic.KeyValuePair<string, SeriesChartType>("Pie", SeriesChartType.Pie)
             };
-            isInitializing = true;
-            cmbtipe.datasource = items;
-            cmbtipe.Displaymember = "key";
-            cmbtipe.valuemember = "value";
-            cmbtipe.SelectedIndex = 0;
+
+            cmbTipe.DataSource = items;
+            cmbTipe.DisplayMember = "Key";
+            cmbTipe.ValueMember = "Value";
+            cmbTipe.SelectedIndex = 0;
 
             isInitializing = false;
-            loadDataChart();
+
+
+            LoadDataChart();
         }
         public void LoadDataChart()
         {
-            chartprodi.series.Clear();
-            chartprodi.titles.Clear();
-            chartprodi.Legend.Clear();
-            chartprodi.ChartAreas.Clear();
+            // Pembersihan memori kanvas secara radikal sebelum merender ulang
+            chartProdi.Series.Clear();
+            chartProdi.Titles.Clear();
+            chartProdi.Legends.Clear();
+            chartProdi.ChartAreas.Clear();
             
-            ChartArea ca = new ChartArea ("MainArea");
-            ca.Axisy.Title = "Program Studi";
-            ca.AxisY.Title = "jumlah mahasiswa";
+            // Pembuatan area grafik
+            ChartArea ca = new ChartArea("MainArea");
+            ca.AxisX.Title = "Program Studi";
+            ca.AxisY.Title = "Jumlah Mahasiswa";
+            ca.AxisX.LabelStyle.Angle = -45;
+            chartProdi.ChartAreas.Add(ca);
 
-        }
-        private void Dasboard_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void tipe_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (isInitializing) return;
-            if (button == 1) { }
-            else
+            try
             {
-                    LoadDataChart
+                // Penentuan jalur pipa data berdasarkan filter
+                if (buttonState == 1)
+                {
+                    dt = dbLogic.getDataChartByTahun(dtpTanggalMasuk.Value);
+        }
+                else
+        {
+                    dt = dbLogic.getAllDataChart();
+                }
 
+                // Penjahitan data ke dalam Series Grafik
+                SeriesChartType tipeTerpilih = (SeriesChartType)cmbTipe.SelectedValue;
+                Series s = new Series("Distribusi Mahasiswa");
+                s.ChartType = tipeTerpilih;
+                s.IsValueShownAsLabel = true;
+
+                if (tipeTerpilih == SeriesChartType.Pie)
+                {
+                    s.Label = "#VAL";       // Nilai angka
+                    s.LegendText = "#VALX"; // Nama kategori
+        }
+
+                // Iterasi matriks data dari database ke titik koordinat visual
+                foreach (DataRow row in dt.Rows)
+        {
+                    string namaProdi = row["NamaProdi"].ToString();
+                    int jumlahMhs = Convert.ToInt32(row["JmlhMhs"]);
+                    s.Points.AddXY(namaProdi, jumlahMhs);
+                }
+
+                chartProdi.Series.Add(s);
+
+                // Ornamen judul dan legenda
+                chartProdi.Titles.Add(new Title("Statistik Mahasiswa per Program Studi", Docking.Top, new Font("Segoe UI", 14, FontStyle.Bold), Color.Black));
+                chartProdi.Legends.Add(new Legend("LegendArea") { Docking = Docking.Right });
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Kegagalan rendering arsitektural: " + ex.Message, "System Error");
         }
     }
 }

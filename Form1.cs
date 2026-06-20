@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
+
 namespace CrudMahasiswaADO
 {
     public partial class FormMahasiswa : Form
@@ -205,11 +206,10 @@ namespace CrudMahasiswaADO
 
         private void btnRekap_Click(object sender, EventArgs e)
         {
-            Dasboard formDashboard = new Dasboard();
+            Form2 formRekap = new Form2();
 
-            formDashboard.Show();
+            formRekap.Show();
 
-            
             this.Hide();
         }
         
@@ -259,7 +259,7 @@ namespace CrudMahasiswaADO
                     }
                 }
                 byte[] imgBytes = ConvertImageToBytes(fotomhs);
-                dbLogic.UpdateMhs(txtNim.Text, txtNama.Text, txtAlamat.Text, cmbJK.Text, dptTanggalLahir.Value.Date, txtProdi.Text, imgBytes);
+                dbLogic.InsertMhs(txtNim.Text, txtNama.Text, txtAlamat.Text, cmbJK.Text, dptTanggalLahir.Value.Date, txtProdi.Text, imgBytes);
                 MessageBox.Show("Data mahasiswa ditambahkan");
                 ClearForm();
                 btn_load_1.PerformClick();

@@ -15,8 +15,8 @@ namespace CrudMahasiswaADO
 
         string prodi;
         DateTime tglmasuk;
+        CrystalReport1 listmahasiswa = new CrystalReport1();
 
-       
         public Form3(string Prodi, DateTime TglMasuk)
         {
             InitializeComponent();
@@ -25,8 +25,8 @@ namespace CrudMahasiswaADO
             try
             {
                 DataTable dtMahasiswa = dbLogic.getDataRekap(prodi, tglmasuk);
-                listmahasiswa.setDataSource(dtMahasiswa);
-                crystalReportViewer1.ReportSource = listMahasiswa;
+                listmahasiswa.SetDataSource(dtMahasiswa);
+                crystalReportViewer1.ReportSource = listmahasiswa;
                 crystalReportViewer1.Refresh();
             }
                 catch(Exception ex)

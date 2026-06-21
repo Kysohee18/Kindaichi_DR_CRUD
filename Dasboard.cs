@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -64,10 +64,11 @@ namespace CrudMahasiswaADO
         {
             FormMahasiswa formUtama = new FormMahasiswa();
 
+            // Ketika FormMahasiswa ditutup, tampilkan kembali Dashboard
+            formUtama.FormClosed += (s, args) => this.Show();
 
             formUtama.Show();
-
-            this.Close();
+            this.Hide(); // Hide, bukan Close — agar aplikasi tidak ikut keluar
         }
         public void LoadDataChart()
         {

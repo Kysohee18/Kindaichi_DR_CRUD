@@ -35,32 +35,32 @@ namespace CrudMahasiswaADO
             }
         }
 
-        
+
         private void Form3_Load(object sender, EventArgs e)
         {
             try
             {
-              
-                SqlCommand cmd = new SqlCommand("sp_Report", conn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@inProdi", prodi);
-                cmd.Parameters.AddWithValue("@inTglMsuk", tglmasuk.Year.ToString());
+                // Memanfaatkan DAL yang sudah Anda bangun dengan sempurna
+                DataTable dtMahasiswa = dbLogic.getDataRekap(prodi, tglmasuk);
 
-                da = new SqlDataAdapter(cmd);
-                dtMahasiswa = new DataTable();
+                if (dtMahasiswa != null && dtMahasiswa.Rows.Count > 0)
+                {
+                    // Membentuk satu instansiasi laporan yang bersih
+                    CrystalReport1 laporan = new CrystalReport1();
+                    laporan.SetDataSource(dtMahasiswa);
 
-                da.Fill(dtMahasiswa);
-
-                CrystalReport1 laporan = new CrystalReport1();
-
-                laporan.SetDataSource(dtMahasiswa);
-
-                crystalReportViewer1.ReportSource = laporan;
-                crystalReportViewer1.Refresh();
+                    // Menyuntikkan laporan ke dalam viewer
+                    crystalReportViewer1.ReportSource = laporan;
+                    crystalReportViewer1.Refresh();
+                }
+                else
+                {
+                    MessageBox.Show("Data rekapitulasi kosong atau tidak ditemukan.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Gagal Memuat Laporan: " + ex.Message, "Error Sistem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Gagal memuat laporan: " + ex.Message, "Error Sistem", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

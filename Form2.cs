@@ -52,35 +52,29 @@ namespace CrudMahasiswaADO
         {
             try
             {
-                if (conn.State == ConnectionState.Closed) 
+                if (cmbProdi.SelectedValue == null)
                 {
-                    conn.Open(); 
+                    MessageBox.Show("Silakan pilih Program Studi terlebih dahulu.");
+                    return;
                 }
 
-                SqlCommand cmd = new SqlCommand("sp_Report", conn);
-                cmd.CommandType = CommandType.StoredProcedure; 
-                cmd.Parameters.Add("@inProdi", SqlDbType.VarChar, 50).Value = cmbProdi.SelectedValue; 
-                cmd.Parameters.Add("@inTglMsuk", SqlDbType.VarChar, 4).Value = dtpTanggalMasuk.Value.Year.ToString(); 
+                string prodiTerpilih = cmbProdi.SelectedValue.ToString();
+                DateTime tahunTerpilih = dtpTanggalMasuk.Value;
 
-                da = new SqlDataAdapter(cmd); 
-                dtMahasiswa = new DataTable(); 
-                da.Fill(dtMahasiswa); 
+                // MENGGUNAKAN DAL: Mengambil data rekapitulasi murni via mesin DAL
+                DataTable dtMahasiswa = dbLogic.getDataRekap(prodiTerpilih, tahunTerpilih);
 
-                dataGridView1.DataSource = dtMahasiswa; 
+                dataGridView1.DataSource = dtMahasiswa;
 
-                if (dtMahasiswa.Rows.Count > 0) 
+                if (dtMahasiswa != null && dtMahasiswa.Rows.Count > 0)
                 {
-                    btnCetak.Enabled = true; 
+                    btnCetak.Enabled = true;
                 }
-                else 
+                else
                 {
-                    btnCetak.Enabled = false; 
-                    MessageBox.Show("Data tidak ditemukan"); 
+                    btnCetak.Enabled = false;
+                    MessageBox.Show("Data mahasiswa untuk periode dan prodi tersebut tidak ditemukan.");
                 }
-            }
-            catch (Exception ex) 
-            {
-                MessageBox.Show("Gagal Load data: " + ex.Message); 
             }
         }
         private void btnCetak_Click(object sender, EventArgs e)

@@ -8,8 +8,6 @@ namespace CrudMahasiswaADO
     public partial class Form3 : Form
     {
         private DAL dbLogic = new DAL();
-        static string connectionString = @"Data Source=localhost\PUTRASQL; Initial Catalog=DBAkademikADO; Integrated Security=True";
-        SqlConnection conn = new SqlConnection(connectionString);
         SqlDataAdapter da;
         DataTable dtMahasiswa;
 
@@ -40,16 +38,15 @@ namespace CrudMahasiswaADO
         {
             try
             {
-                // Memanfaatkan DAL yang sudah Anda bangun dengan sempurna
+                
                 DataTable dtMahasiswa = dbLogic.getDataRekap(prodi, tglmasuk);
 
                 if (dtMahasiswa != null && dtMahasiswa.Rows.Count > 0)
                 {
-                    // Membentuk satu instansiasi laporan yang bersih
                     CrystalReport1 laporan = new CrystalReport1();
                     laporan.SetDataSource(dtMahasiswa);
 
-                    // Menyuntikkan laporan ke dalam viewer
+                    
                     crystalReportViewer1.ReportSource = laporan;
                     crystalReportViewer1.Refresh();
                 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -27,8 +27,12 @@ namespace CrudMahasiswaADO
             }
             return localIP;
         }
-        private static string connectionString = $"Data Source={GetLocalIPAddress()}; Initial Catalog=DBAkademikADO; User ID=sa; Password=passwordsa";
+        // Membaca connection string dari App.config agar konsisten & mudah diubah
+        private static string connectionString = System.Configuration.ConfigurationManager
+            .ConnectionStrings["CrudMahasiswaADO.Properties.Settings.DBAkademikADOConnectionString"]
+            .ConnectionString;
         private SqlConnection conn = new SqlConnection(connectionString);
+
         private SqlDataAdapter da;
         private DataTable dtMahasiswa;
         private DataTable dtProdi;

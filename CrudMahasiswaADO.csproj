@@ -80,16 +80,14 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class1.cs" />
-    <Compile Include="CrystalReport1.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>CrystalReport1.rpt</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
+    <!-- CrystalReport1.cs removed: it was a stale duplicate of CrystalReport11.cs,
+         causing CS0111 "Type 'CachedCrystalReport1' already defines 'CreateReport'" -->
+
     <Compile Include="CrystalReport11.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

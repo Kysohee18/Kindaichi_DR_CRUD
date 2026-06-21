@@ -76,6 +76,10 @@ namespace CrudMahasiswaADO
                     MessageBox.Show("Data mahasiswa untuk periode dan prodi tersebut tidak ditemukan.");
                 }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Gagal memuat data: " + ex.Message);
+            }
         }
         private void btnCetak_Click(object sender, EventArgs e)
         {

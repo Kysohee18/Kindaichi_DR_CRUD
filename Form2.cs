@@ -14,10 +14,6 @@ namespace CrudMahasiswaADO
     public partial class Form2 : Form
         
     {   DAL dbLogic = new DAL();
-        // Mengganti nama komputer dengan localhost untuk menghindari SocketException
-        // Menggunakan @ dan localhost untuk memotong translasi DNS pembawa SocketException
-        static string connectionString = @"Data Source=localhost\PUTRASQL; Initial Catalog=DBAkademikADO; Integrated Security=True";
-        SqlConnection conn = new SqlConnection(connectionString);
         SqlDataAdapter da;
         DataTable dtMahasiswa;
         DataTable dtprodi;
@@ -29,36 +25,27 @@ namespace CrudMahasiswaADO
 
         private void Form2_Load(object sender, EventArgs e)
         {
-            dtpTanggalMasuk.Format = DateTimePickerFormat.Custom; 
-            dtpTanggalMasuk.CustomFormat = "yyyy"; 
-            dtpTanggalMasuk.ShowUpDown = true; 
-            dtpTanggalMasuk.MinDate = new DateTime(2000, 1, 1); 
-            dtpTanggalMasuk.MaxDate = DateTime.Now; 
-            cmbProdi.DropDownStyle = ComboBoxStyle.DropDownList; 
-            btnCetak.Enabled = false; 
+            dtpTanggalMasuk.Format = DateTimePickerFormat.Custom;
+            dtpTanggalMasuk.CustomFormat = "yyyy";
+            dtpTanggalMasuk.ShowUpDown = true;
+            dtpTanggalMasuk.MinDate = new DateTime(2000, 1, 1);
+            dtpTanggalMasuk.MaxDate = DateTime.Now;
+
+            cmbProdi.DropDownStyle = ComboBoxStyle.DropDownList;
+            btnCetak.Enabled = false;
 
             try
             {
-                if (conn.State == ConnectionState.Closed) 
-                {
-                    conn.Open(); 
-                }
+                DataTable dtprodi = dbLogic.getProdi();
 
-                SqlCommand cmd = new SqlCommand("select namaprodi from programstudi", conn); //
-                cmd.CommandType = CommandType.Text; 
-                dtprodi = new DataTable(); 
-                da = new SqlDataAdapter(cmd); 
-                da.Fill(dtprodi); 
-
-                cmbProdi.DataSource = dtprodi; 
-                cmbProdi.DisplayMember = "namaprodi"; 
-                cmbProdi.ValueMember = "namaprodi"; 
+                cmbProdi.DataSource = dtprodi;
+                cmbProdi.DisplayMember = "namaprodi";
+                cmbProdi.ValueMember = "namaprodi";
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                MessageBox.Show("Gagal Load data: " + ex.Message); 
+                MessageBox.Show("Gagal memuat data Prodi: " + ex.Message);
             }
-
         }
 
         private void btnLoad_Click(object sender, EventArgs e)

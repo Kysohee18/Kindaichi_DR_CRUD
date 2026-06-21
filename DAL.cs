@@ -27,10 +27,7 @@ namespace CrudMahasiswaADO
             }
             return localIP;
         }
-        // Membaca connection string dari App.config
-        private static string connectionString = System.Configuration.ConfigurationManager
-            .ConnectionStrings["CrudMahasiswaADO.Properties.Settings.DBAkademikADOConnectionString"]
-            .ConnectionString;
+        private static string connectionString = @"Data Source=.\PUTRASQL; Initial Catalog=DBAkademikADO; Integrated Security=True; TrustServerCertificate=True";
         private SqlConnection conn = new SqlConnection(connectionString);
 
         private SqlDataAdapter da;

@@ -6,7 +6,28 @@ namespace CrudMahasiswaADO
 {
     public class DAL
     {
-        private static string connectionString = @"Data Source=DESKTOP-6V58GOQ\PUTRASQL; Initial Catalog=DBAkademikADO; Integrated Security=True";
+        public static string GetLocalIPAddress()
+        {
+            string localIP = string.Empty;
+            try
+            {
+                var host = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName());
+                foreach (var ip in host.AddressList)
+                {
+                    if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                    {
+                        localIP = ip.ToString();
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error getting local IP address: " + ex.Message);
+            }
+            return localIP;
+        }
+        private static string connectionString = $"Data Source={GetLocalIPAddress()}; Initial Catalog=DBAkademikADO; User ID=sa; Password=passwordsa";
         private SqlConnection conn = new SqlConnection(connectionString);
         private SqlDataAdapter da;
         private DataTable dtMahasiswa;
@@ -48,12 +69,12 @@ namespace CrudMahasiswaADO
             {
                 SqlCommand cmd = new SqlCommand("sp_InsertMahasiswa", conn, trans);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@NIM", nim);
-                cmd.Parameters.AddWithValue("@Nama", nama);
-                cmd.Parameters.AddWithValue("@Alamat", alamat);
-                cmd.Parameters.AddWithValue("@TanggalLahir", tanggallahir);
-                cmd.Parameters.AddWithValue("@JK", jeniskelamin);
-                cmd.Parameters.AddWithValue("@KodeProdi", kodeProdi);
+                cmd.Parameters.AddWithValue("@pNIM", nim);
+                cmd.Parameters.AddWithValue("@pNama", nama);
+                cmd.Parameters.AddWithValue("@pAlamat", alamat);
+                cmd.Parameters.AddWithValue("@pTanggalLahir", tanggallahir);
+                cmd.Parameters.AddWithValue("@pJenisKelamin", jeniskelamin);
+                cmd.Parameters.AddWithValue("@pKodeProdi", kodeProdi);
 
                 if (foto != null) cmd.Parameters.AddWithValue("@pFoto", foto);
                 else cmd.Parameters.Add("@pFoto", SqlDbType.VarBinary, -1).Value = DBNull.Value;
@@ -87,12 +108,12 @@ namespace CrudMahasiswaADO
             if (conn.State == ConnectionState.Closed) conn.Open();
             SqlCommand cmd = new SqlCommand("sp_UpdateMahasiswa", conn);
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("@NIM", nim);
-            cmd.Parameters.AddWithValue("@Nama", nama);
-            cmd.Parameters.AddWithValue("@Alamat", alamat);
-            cmd.Parameters.AddWithValue("@TanggalLahir", tanggallahir);
-            cmd.Parameters.AddWithValue("@JK", jeniskelamin);
-            cmd.Parameters.AddWithValue("@KodeProdi", kodeProdi);
+            cmd.Parameters.AddWithValue("@pNIM", nim);
+            cmd.Parameters.AddWithValue("@pNama", nama);
+            cmd.Parameters.AddWithValue("@pAlamat", alamat);
+            cmd.Parameters.AddWithValue("@pTanggalLahir", tanggallahir);
+            cmd.Parameters.AddWithValue("@pJenisKelamin", jeniskelamin);
+            cmd.Parameters.AddWithValue("@pKodeProdi", kodeProdi);
 
             if (foto != null) cmd.Parameters.AddWithValue("@pFoto", foto);
             else cmd.Parameters.Add("@pFoto", SqlDbType.VarBinary, -1).Value = DBNull.Value;

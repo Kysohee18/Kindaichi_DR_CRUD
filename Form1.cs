@@ -49,7 +49,6 @@ namespace CrudMahasiswaADO
             LoadData();
         }
 
-        // Pipa data utama yang sebelumnya Anda hapus, kini dirakit kembali
         private void LoadData()
         {
             try
@@ -190,6 +189,32 @@ namespace CrudMahasiswaADO
                 dptTanggalLahir.Value = Convert.ToDateTime(row.Cells["TanggalLahir"].Value);
                 txtAlamat.Text = row.Cells["Alamat"].Value.ToString();
                 txtProdi.Text = row.Cells["KodeProdi"].Value.ToString();
+
+                
+                try
+                {
+                    if (row.Cells["Foto"].Value != null && row.Cells["Foto"].Value != DBNull.Value)
+                    {
+                        byte[] imgBytes = (byte[])row.Cells["Foto"].Value;
+
+                        using (MemoryStream ms = new MemoryStream(imgBytes))
+                        {
+                            fotomhs.Image = Image.FromStream(ms);
+                            fotomhs.SizeMode = PictureBoxSizeMode.StretchImage;
+                        }
+                    }
+                    else
+                    {
+                        fotomhs.Image = null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    
+                    fotomhs.Image = null;
+                    MessageBox.Show("Gagal memuat gambar mahasiswa: " + ex.Message);
+                }
+                
             }
         }
 
@@ -258,21 +283,29 @@ namespace CrudMahasiswaADO
                         return ms.ToArray();
                     }
                 }
-                byte[] imgBytes = ConvertImageToBytes(fotomhs);
+
+                
+                byte[] imgBytes = null;
+                if (fotomhs.Image != null)
+                {
+                    imgBytes = ConvertImageToBytes(fotomhs);
+                }
+
                 dbLogic.InsertMhs(txtNim.Text, txtNama.Text, txtAlamat.Text, cmbJK.Text, dptTanggalLahir.Value.Date, txtProdi.Text, imgBytes);
-                MessageBox.Show("Data mahasiswa ditambahkan");
+
+                MessageBox.Show("Data mahasiswa berhasil ditambahkan!");
                 ClearForm();
-                btn_load_1.PerformClick();
+                btn_load_1.PerformClick(); 
             }
             catch (SqlException ex)
             {
                 SimpanLog(ex.Message);
-                MessageBox.Show("sql error " + ex.Message);
+                MessageBox.Show("SQL Error: " + ex.Message);
             }
             catch (Exception ex)
             {
                 SimpanLog(ex.Message);
-                MessageBox.Show("General error " + ex.Message);
+                MessageBox.Show("General Error: " + ex.Message);
             }
 
 

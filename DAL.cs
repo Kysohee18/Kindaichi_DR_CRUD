@@ -27,7 +27,7 @@ namespace CrudMahasiswaADO
             }
             return localIP;
         }
-        private static string connectionString = @"Data Source=.\PUTRASQL; Initial Catalog=DBAkademikADO; Integrated Security=True; TrustServerCertificate=True";
+        private static string connectionString = $"Data Source={GetLocalIPAddress()}; Initial Catalog=DBAkademikADO; User ID=sa; Password=passwordsa";
         private SqlConnection conn = new SqlConnection(connectionString);
 
         private SqlDataAdapter da;

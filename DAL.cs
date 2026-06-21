@@ -27,7 +27,7 @@ namespace CrudMahasiswaADO
             }
             return localIP;
         }
-        // Membaca connection string dari App.config agar konsisten & mudah diubah
+        // Membaca connection string dari App.config
         private static string connectionString = System.Configuration.ConfigurationManager
             .ConnectionStrings["CrudMahasiswaADO.Properties.Settings.DBAkademikADOConnectionString"]
             .ConnectionString;
@@ -182,7 +182,7 @@ namespace CrudMahasiswaADO
         public DataTable getProdi()
         {
             if (conn.State == ConnectionState.Closed) conn.Open();
-            SqlCommand cmd = new SqlCommand("select namaprodi from prodi", conn);
+            SqlCommand cmd = new SqlCommand("select NamaProdi from ProgramStudi", conn);
             cmd.CommandType = CommandType.Text;
             dtProdi = new DataTable();
             da = new SqlDataAdapter(cmd);

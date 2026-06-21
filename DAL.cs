@@ -27,7 +27,7 @@ namespace CrudMahasiswaADO
             }
             return localIP;
         }
-        private static string connectionString = $"Data Source={GetLocalIPAddress()}; Initial Catalog=DBAkademikADO; User ID=sa; Password=passwordsa";
+        private static string connectionString = $"Data Source={GetLocalIPAddress}; Initial Catalog=DBAkademikADO; User ID=sa; Password=passwordsa";
         private SqlConnection conn = new SqlConnection(connectionString);
         private SqlDataAdapter da;
         private DataTable dtMahasiswa;
@@ -73,6 +73,7 @@ namespace CrudMahasiswaADO
                 cmd.Parameters.AddWithValue("@pNama", nama);
                 cmd.Parameters.AddWithValue("@pAlamat", alamat);
                 cmd.Parameters.AddWithValue("@pTanggalLahir", tanggallahir);
+
                 cmd.Parameters.AddWithValue("@pJenisKelamin", jeniskelamin);
                 cmd.Parameters.AddWithValue("@pKodeProdi", kodeProdi);
 
@@ -112,6 +113,8 @@ namespace CrudMahasiswaADO
             cmd.Parameters.AddWithValue("@pNama", nama);
             cmd.Parameters.AddWithValue("@pAlamat", alamat);
             cmd.Parameters.AddWithValue("@pTanggalLahir", tanggallahir);
+
+
             cmd.Parameters.AddWithValue("@pJenisKelamin", jeniskelamin);
             cmd.Parameters.AddWithValue("@pKodeProdi", kodeProdi);
 
